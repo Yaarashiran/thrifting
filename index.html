@@ -27,6 +27,7 @@
 
     <!-- Google Maps JavaScript API -->
     <script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         // Initialize and display the map
         function initMap() {
             // Tel Aviv coordinates (latitude, longitude)
@@ -63,6 +64,9 @@
                     const link = prompt("Optional: Enter a website link for this location (leave blank to skip):");
                     placeMarker(event.latLng, map, description, category, photoUrl, link, markers);
                 }
+    const supabaseUrl = 'https://cyukejuzxabedwibjnfk.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5dWtlanV6eGFiZWR3aWJqbmZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNjI4OTQsImV4cCI6MjA1NjgzODg5NH0.wBG7sj7NU0B9pc8ouLL2F9-cNd4tK0_7k1-gTLSlwNI'; 
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
             });
         }
 
@@ -134,7 +138,41 @@
                 favoritesList.style.display = 'none'; // Hide the list
             }
         }
+// Save a marker to the database
+async function saveMarker(location, description, category, photoUrl, link) {
+    const { data, error } = await supabase
+        .from('markers')
+        .insert([
+            {
+                lat: location.lat(),
+                lng: location.lng(),
+                description,
+                category,
+                photo_url: photoUrl,
+                link
+            }
+        ]);
 
+    if (error) {
+        console.error("Error saving marker: ", error);
+    } else {
+        console.log("Marker saved successfully: ", data);
+    }
+}
+
+// Load markers from the database
+async function loadMarkers() {
+    const { data, error } = await supabase
+        .from('markers')
+        .select('*');
+
+    if (error) {
+        console.error("Error loading markers: ", error);
+    } else {
+        console.log("Markers loaded: ", data);
+        // Display markers on the map
+    }
+}
         // Function to update category filter buttons
         function updateCategoryFilters(markers) {
             const categoryFilters = document.getElementById('category-filters');
